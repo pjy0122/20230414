@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  account String @unique
+  name String?
+  
+  // Todo[]를 까보면 밑에 model Todo 내용들이 나온다 
+  todos Todo[]
+
+  // 현재 시간 prisma에서 나온 문법
+  createAt DateTime @default(now())
+
+  // 업데이트가 이루어 질때마다 시간 갱신
+  updateAt DateTime @updatedAt
+}
+
+model Todo {
+  id Int @id @default(autoincrement())
+  todo String
+
+  // Boolean => true, false만 담을수 있는거
+  isDone Boolean
+
+  // references: [id]는 user의 id만 기억해서 위의 user 데이터를 가져온다? 
+  user User @relation(fields: [userId], references: [id])
+  userId Int 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // mysql을 쓰기위해선 index를 써야하고 index는 검색 효율 증가 시켜줌
+  @@index([userId])
+}
